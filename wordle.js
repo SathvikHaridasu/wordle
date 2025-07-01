@@ -76,13 +76,28 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let col = 0; col < 5; col++) {
       const idx = row * 5 + col;
       const tile = grid.children[idx];
-      tile.classList.remove('correct', 'present', 'absent');
-      tile.classList.add(feedbackArr[col]);
-      if (["correct","present","absent"].includes(feedbackArr[col])) {
-        tile.style.color = "#fff";
-      } else {
-        tile.style.color = "#222";
-      }
+      const letter = guesses[row][col];
+      // Remove previous animation and feedback classes
+      tile.classList.remove('correct', 'present', 'absent', 'flip');
+      // Stagger flip animation
+      setTimeout(() => {
+        tile.classList.add('flip');
+        // Hide letter at halfway point
+        setTimeout(() => {
+          tile.textContent = '';
+        }, 150);
+        // Reveal color and letter at end of flip
+        setTimeout(() => {
+          tile.classList.remove('flip');
+          tile.classList.add(feedbackArr[col]);
+          tile.textContent = letter;
+          if (["correct","present","absent"].includes(feedbackArr[col])) {
+            tile.style.color = "#fff";
+          } else {
+            tile.style.color = "#222";
+          }
+        }, 300);
+      }, col * 300);
     }
   }
 
@@ -139,7 +154,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       showFeedback('');
-      renderGrid();
+      // Delay renderGrid until after the last tile's flip animation
+      setTimeout(() => {
+        renderGrid();
+      }, 5 * 300 + 50); // 5 tiles * 300ms per flip + small buffer
       return;
     }
     if (/^[A-Z]$/.test(key) && currentCol < 5) {
