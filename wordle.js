@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Game Logic Variables ---
   let targetWord = '';
   let usedKeys = {}; // {A: 'correct'|'present'|'absent'}
+  let feedbacks = Array.from({ length: 6 }, () => Array(5).fill(null)); // Store feedback for each row
 
   // --- Utility Functions ---
   function pickDailyWord() {
@@ -71,12 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function revealRow(row, feedbackArr) {
+    feedbacks[row] = feedbackArr.slice(); // Store feedback for this row
     for (let col = 0; col < 5; col++) {
       const idx = row * 5 + col;
       const tile = grid.children[idx];
       tile.classList.remove('correct', 'present', 'absent');
       tile.classList.add(feedbackArr[col]);
-      // For colorblind: add .pattern if needed (future)
+      if (["correct","present","absent"].includes(feedbackArr[col])) {
+        tile.style.color = "#fff";
+      } else {
+        tile.style.color = "#222";
+      }
     }
   }
 
@@ -163,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentRow = 0;
     currentCol = 0;
     guesses = Array.from({ length: 6 }, () => Array(5).fill(''));
+    feedbacks = Array.from({ length: 6 }, () => Array(5).fill(null));
     gameState = 'active';
     renderGrid();
     renderKeyboard();
@@ -183,6 +190,15 @@ document.addEventListener('DOMContentLoaded', () => {
         tile.setAttribute('data-col', col);
         tile.setAttribute('aria-label', `Row ${row + 1} Column ${col + 1}`);
         tile.textContent = guesses[row][col] || '';
+        // Apply feedback class if available
+        const feedback = feedbacks[row][col];
+        tile.classList.remove('correct', 'present', 'absent');
+        if (["correct","present","absent"].includes(feedback)) {
+          tile.classList.add(feedback);
+          tile.style.color = "#fff";
+        } else {
+          tile.style.color = guesses[row][col] ? '#222' : '#222';
+        }
         grid.appendChild(tile);
       }
     }
