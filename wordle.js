@@ -1,0 +1,223 @@
+// wordle.js - MVP Scaffold
+
+document.addEventListener('DOMContentLoaded', () => {
+  // DOM Elements
+  const grid = document.getElementById('game-grid');
+  const keyboard = document.getElementById('keyboard');
+  const guessCounter = document.getElementById('guess-counter');
+  const feedback = document.getElementById('feedback');
+
+  // Game State
+  let currentRow = 0;
+  let currentCol = 0;
+  let guesses = Array.from({ length: 6 }, () => Array(5).fill(''));
+  let gameState = 'active'; // 'active', 'won', 'lost', 'waiting'
+
+  // --- Game Logic Variables ---
+  let targetWord = '';
+  let usedKeys = {}; // {A: 'correct'|'present'|'absent'}
+
+  // --- Utility Functions ---
+  function pickDailyWord() {
+    // Deterministic: Use today's date as index
+    const epoch = new Date(2022, 0, 1); // Fixed start date
+    const now = new Date();
+    const days = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
+    return WORDS[days % WORDS.length].toUpperCase();
+  }
+
+  function isValidWord(word) {
+    return WORDS.includes(word.toLowerCase());
+  }
+
+  function updateGuessCounter() {
+    guessCounter.textContent = `${currentRow + 1}/6`;
+  }
+
+  function updateKeyboard() {
+    // Update key classes based on usedKeys
+    document.querySelectorAll('.key').forEach(btn => {
+      const key = btn.getAttribute('data-key').toUpperCase();
+      btn.classList.remove('correct', 'present', 'absent');
+      if (usedKeys[key]) btn.classList.add(usedKeys[key]);
+    });
+  }
+
+  function giveFeedback(guess) {
+    // Returns array: 'correct', 'present', 'absent' for each letter
+    const result = Array(5).fill('absent');
+    const targetArr = targetWord.split('');
+    const guessArr = guess.split('');
+    const used = Array(5).fill(false);
+    // First pass: correct
+    for (let i = 0; i < 5; i++) {
+      if (guessArr[i] === targetArr[i]) {
+        result[i] = 'correct';
+        used[i] = true;
+      }
+    }
+    // Second pass: present
+    for (let i = 0; i < 5; i++) {
+      if (result[i] === 'correct') continue;
+      for (let j = 0; j < 5; j++) {
+        if (!used[j] && guessArr[i] === targetArr[j]) {
+          result[i] = 'present';
+          used[j] = true;
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+  function revealRow(row, feedbackArr) {
+    for (let col = 0; col < 5; col++) {
+      const idx = row * 5 + col;
+      const tile = grid.children[idx];
+      tile.classList.remove('correct', 'present', 'absent');
+      tile.classList.add(feedbackArr[col]);
+      // For colorblind: add .pattern if needed (future)
+    }
+  }
+
+  function updateUsedKeys(guess, feedbackArr) {
+    for (let i = 0; i < 5; i++) {
+      const letter = guess[i];
+      const prev = usedKeys[letter];
+      const curr = feedbackArr[i];
+      if (prev === 'correct') continue;
+      if (prev === 'present' && curr === 'absent') continue;
+      usedKeys[letter] = curr;
+    }
+  }
+
+  // --- Input Handling ---
+  function handleKeyInput(key) {
+    if (gameState !== 'active') return;
+    key = key.toUpperCase();
+    if (key === 'BACKSPACE' || key === 'BACK') {
+      if (currentCol > 0) {
+        currentCol--;
+        guesses[currentRow][currentCol] = '';
+        renderGrid();
+      }
+      return;
+    }
+    if (key === 'ENTER') {
+      const guess = guesses[currentRow].join('');
+      if (guess.length < 5) {
+        showFeedback('Not enough letters');
+        return;
+      }
+      if (!isValidWord(guess)) {
+        showFeedback('Not in word list');
+        return;
+      }
+      // Feedback
+      const feedbackArr = giveFeedback(guess);
+      revealRow(currentRow, feedbackArr);
+      updateUsedKeys(guess, feedbackArr);
+      updateKeyboard();
+      if (guess === targetWord) {
+        gameState = 'won';
+        showFeedback('You win!');
+        updateGuessCounter();
+        return;
+      }
+      currentRow++;
+      currentCol = 0;
+      updateGuessCounter();
+      if (currentRow === 6) {
+        gameState = 'lost';
+        showFeedback(`The word was ${targetWord}`);
+        return;
+      }
+      showFeedback('');
+      renderGrid();
+      return;
+    }
+    if (/^[A-Z]$/.test(key) && currentCol < 5) {
+      guesses[currentRow][currentCol] = key;
+      currentCol++;
+      renderGrid();
+    }
+  }
+
+  // --- Event Listeners ---
+  keyboard.addEventListener('click', e => {
+    if (e.target.classList.contains('key')) {
+      handleKeyInput(e.target.getAttribute('data-key'));
+    }
+  });
+  document.addEventListener('keydown', e => {
+    let key = e.key;
+    if (key === 'Backspace') key = 'BACK';
+    if (key === 'Enter') key = 'ENTER';
+    handleKeyInput(key);
+  });
+
+  // --- Init ---
+  function startGame() {
+    targetWord = pickDailyWord();
+    usedKeys = {};
+    currentRow = 0;
+    currentCol = 0;
+    guesses = Array.from({ length: 6 }, () => Array(5).fill(''));
+    gameState = 'active';
+    renderGrid();
+    renderKeyboard();
+    updateGuessCounter();
+    showFeedback('');
+  }
+
+  startGame();
+
+  // Render Game Grid
+  function renderGrid() {
+    grid.innerHTML = '';
+    for (let row = 0; row < 6; row++) {
+      for (let col = 0; col < 5; col++) {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.setAttribute('data-row', row);
+        tile.setAttribute('data-col', col);
+        tile.setAttribute('aria-label', `Row ${row + 1} Column ${col + 1}`);
+        tile.textContent = guesses[row][col] || '';
+        grid.appendChild(tile);
+      }
+    }
+  }
+
+  // Render Virtual Keyboard
+  function renderKeyboard() {
+    // Official Wordle layout
+    const rows = [
+      ['Q','W','E','R','T','Y','U','I','O','P'],
+      ['A','S','D','F','G','H','J','K','L'],
+      ['ENTER','Z','X','C','V','B','N','M','BACK']
+    ];
+    keyboard.innerHTML = '';
+    rows.forEach(row => {
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'keyboard-row';
+      row.forEach(key => {
+        const btn = document.createElement('button');
+        btn.className = 'key';
+        btn.setAttribute('data-key', key);
+        btn.setAttribute('aria-label', key);
+        btn.textContent = key === 'BACK' ? '⌫' : key;
+        if (key === 'ENTER' || key === 'BACK') btn.classList.add('wide');
+        rowDiv.appendChild(btn);
+      });
+      keyboard.appendChild(rowDiv);
+    });
+  }
+
+  // Placeholder: Feedback
+  function showFeedback(msg) {
+    feedback.textContent = msg;
+  }
+
+  // TODO: Add event listeners for keyboard and physical input
+  // TODO: Implement game logic, state transitions, feedback, local storage, etc.
+}); 
