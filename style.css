@@ -161,6 +161,12 @@ header h1 {
 .key.pattern.absent {
   background: var(--pattern-absent);
 }
+.key.wide {
+  width: 64px;
+  min-width: 64px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
 #feedback {
   min-height: 24px;
   text-align: center;
@@ -181,6 +187,11 @@ header h1 {
     height: 40px;
     min-height: 40px;
     font-size: 1rem;
+  }
+  .key.wide {
+    width: 48px;
+    min-width: 48px;
+    font-size: 0.98rem;
   }
 }
 @media (min-width: 600px) {
