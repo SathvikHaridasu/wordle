@@ -148,11 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (key === 'ENTER') {
       const guess = guesses[currentRow].join('');
       if (guess.length < 5) {
-        showFeedback('Not enough letters');
+        showFeedback('Not enough letters', 'error', 2000);
         return;
       }
       if (!isValidWord(guess)) {
-        showFeedback('Not in word list');
+        showFeedback('Not in word list', 'error', 2000);
         return;
       }
       // Feedback
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateKeyboard();
       if (guess === targetWord) {
         gameState = 'won';
-        showFeedback('You win!');
+        showFeedback('🎉 You win! 🎉', 'success', 0);
         updateGuessCounter();
         return;
       }
@@ -171,10 +171,10 @@ document.addEventListener('DOMContentLoaded', () => {
       updateGuessCounter();
       if (currentRow === 6) {
         gameState = 'lost';
-        showFeedback(`The word was ${targetWord}`);
+        showFeedback(`Game Over! The word was ${targetWord}`, 'error', 0);
         return;
       }
-      showFeedback('');
+      hideFeedback();
       // Delay renderGrid until after the last tile's flip animation
       setTimeout(() => {
         renderGrid();
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderGrid();
     renderKeyboard();
     updateGuessCounter();
-    showFeedback('');
+    hideFeedback();
   }
 
   startGame();
@@ -280,9 +280,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Placeholder: Feedback
-  function showFeedback(msg) {
+  // Enhanced Feedback System
+  function showFeedback(msg, type = 'info', duration = 3000) {
+    // Clear any existing timeout
+    if (feedback.timeout) {
+      clearTimeout(feedback.timeout);
+    }
+    
+    // Remove all existing classes
+    feedback.classList.remove('show', 'error', 'success', 'info', 'shake');
+    
+    // Set message
     feedback.textContent = msg;
+    
+    // Add appropriate class based on type
+    if (type === 'error') {
+      feedback.classList.add('error', 'shake');
+    } else if (type === 'success') {
+      feedback.classList.add('success');
+    } else {
+      feedback.classList.add('info');
+    }
+    
+    // Show the message with animation
+    setTimeout(() => {
+      feedback.classList.add('show');
+    }, 10);
+    
+    // Auto-hide after duration (unless it's a success message)
+    if (type !== 'success' && duration > 0) {
+      feedback.timeout = setTimeout(() => {
+        hideFeedback();
+      }, duration);
+    }
+  }
+  
+  function hideFeedback() {
+    feedback.classList.remove('show');
+    if (feedback.timeout) {
+      clearTimeout(feedback.timeout);
+      feedback.timeout = null;
+    }
   }
 
   // TODO: Add event listeners for keyboard and physical input
