@@ -111,18 +111,55 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 32px 0 8px 0;
+  margin: 24px 0 16px 0;
+  padding: 20px 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 header h1 {
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin: 0 0 4px 0;
-  letter-spacing: 0.1em;
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0 0 10px 0;
+  letter-spacing: 0.18em;
+  color: #222;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  position: relative;
+  display: inline-block;
 }
+
+header h1::after {
+  content: '';
+  display: block;
+  margin: 10px auto 0 auto;
+  width: 60%;
+  height: 4px;
+  border-radius: 2px;
+  background: #6aaa64;
+  opacity: 0.85;
+}
+
 #guess-counter {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 8px;
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 0;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+#guess-counter:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 #game-grid {
   display: grid;
@@ -341,6 +378,28 @@ header h1 {
   
   .social-links a {
     padding: 4px;
+  }
+  
+  /* Mobile header adjustments */
+  header {
+    margin: 16px 0 12px 0;
+    padding: 16px 0;
+  }
+  
+  header h1 {
+    font-size: 1.2rem;
+    letter-spacing: 0.12em;
+  }
+  
+  header h1::after {
+    height: 3px;
+    width: 50%;
+    margin-top: 7px;
+  }
+  
+  #guess-counter {
+    font-size: 1rem;
+    padding: 6px 12px;
   }
 }
 @media (min-width: 600px) {
