@@ -23,7 +23,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Deterministic: Use today's date as index
     const epoch = new Date(2022, 0, 1); // Fixed start date
     const now = new Date();
-    const days = Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
+    
+    // Get today's date in YYYY-MM-DD format for consistent daily changes
+    const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const epochDate = epoch.toISOString().split('T')[0]; // YYYY-MM-DD
+    
+    // Calculate days since epoch
+    const days = Math.floor((new Date(today) - new Date(epochDate)) / (1000 * 60 * 60 * 24));
+    
+    // Debug logging (remove in production)
+    console.log('Today:', today);
+    console.log('Days since epoch:', days);
+    console.log('Word index:', days % WORDS.length);
+    
+    // Store today's date to ensure we don't get the same word twice
+    const lastPlayedDate = localStorage.getItem('wordleLastPlayedDate');
+    if (lastPlayedDate === today) {
+      console.log('Already played today, using cached word');
+    } else {
+      console.log('New day, new word!');
+      localStorage.setItem('wordleLastPlayedDate', today);
+    }
+    
     return WORDS[days % WORDS.length].toUpperCase();
   }
 
@@ -182,6 +203,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Init ---
   function startGame() {
+    // Clear any old game state if it's a new day
+    const today = new Date().toISOString().split('T')[0];
+    const lastPlayedDate = localStorage.getItem('wordleLastPlayedDate');
+    
+    if (lastPlayedDate !== today) {
+      // New day - clear any stored game state
+      localStorage.removeItem('wordleGameState');
+      localStorage.removeItem('wordleGuesses');
+      localStorage.removeItem('wordleUsedKeys');
+      console.log('New day detected, cleared old game state');
+    }
+    
     targetWord = pickDailyWord();
     usedKeys = {};
     currentRow = 0;
