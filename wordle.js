@@ -20,32 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Utility Functions ---
   function pickDailyWord() {
-    // Deterministic: Use today's date as index
-    const epoch = new Date(2022, 0, 1); // Fixed start date
-    const now = new Date();
+    // Random word selection - different every time you reload
+    const randomIndex = Math.floor(Math.random() * WORDS.length);
+    const selectedWord = WORDS[randomIndex].toUpperCase();
     
-    // Get today's date in YYYY-MM-DD format for consistent daily changes
-    const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
-    const epochDate = epoch.toISOString().split('T')[0]; // YYYY-MM-DD
+    // Debug logging
+    console.log('Random word selected at index:', randomIndex);
+    console.log('Selected word:', selectedWord);
     
-    // Calculate days since epoch
-    const days = Math.floor((new Date(today) - new Date(epochDate)) / (1000 * 60 * 60 * 24));
-    
-    // Debug logging (remove in production)
-    console.log('Today:', today);
-    console.log('Days since epoch:', days);
-    console.log('Word index:', days % WORDS.length);
-    
-    // Store today's date to ensure we don't get the same word twice
-    const lastPlayedDate = localStorage.getItem('wordleLastPlayedDate');
-    if (lastPlayedDate === today) {
-      console.log('Already played today, using cached word');
-    } else {
-      console.log('New day, new word!');
-      localStorage.setItem('wordleLastPlayedDate', today);
-    }
-    
-    return WORDS[days % WORDS.length].toUpperCase();
+    return selectedWord;
   }
 
   function isValidWord(word) {
@@ -173,6 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState = 'lost';
         showFeedback(`Game Over! The word was ${targetWord}`, 'error', 0);
         showCorrectAnswer();
+        
+        // Also reveal the correct word in the last row for visual confirmation
+        setTimeout(() => {
+          revealCorrectWord();
+        }, 1000);
+        
         return;
       }
       hideFeedback();
@@ -204,18 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Init ---
   function startGame() {
-    // Clear any old game state if it's a new day
-    const today = new Date().toISOString().split('T')[0];
-    const lastPlayedDate = localStorage.getItem('wordleLastPlayedDate');
-    
-    if (lastPlayedDate !== today) {
-      // New day - clear any stored game state
-      localStorage.removeItem('wordleGameState');
-      localStorage.removeItem('wordleGuesses');
-      localStorage.removeItem('wordleUsedKeys');
-      console.log('New day detected, cleared old game state');
-    }
-    
     // Clear any existing correct answer display
     const existingAnswer = document.getElementById('correct-answer');
     if (existingAnswer) {
@@ -331,6 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   function showCorrectAnswer() {
+    console.log('Showing correct answer:', targetWord); // Debug log
+    
     // Create a special display for the correct answer
     const correctAnswerDiv = document.createElement('div');
     correctAnswerDiv.id = 'correct-answer';
@@ -349,12 +328,38 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Insert after the game grid
     const gameGrid = document.getElementById('game-grid');
-    gameGrid.parentNode.insertBefore(correctAnswerDiv, gameGrid.nextSibling);
+    if (gameGrid && gameGrid.parentNode) {
+      gameGrid.parentNode.insertBefore(correctAnswerDiv, gameGrid.nextSibling);
+      
+      // Animate in
+      setTimeout(() => {
+        correctAnswerDiv.classList.add('show');
+        console.log('Correct answer display added and animated'); // Debug log
+      }, 100);
+    } else {
+      console.error('Could not find game grid to insert correct answer'); // Debug log
+    }
+  }
+  
+  function revealCorrectWord() {
+    // Fill the last row with the correct word and show it as all correct
+    const lastRow = 5; // 6th row (0-indexed)
+    const targetArr = targetWord.split('');
     
-    // Animate in
-    setTimeout(() => {
-      correctAnswerDiv.classList.add('show');
-    }, 100);
+    // Update the guesses array
+    for (let col = 0; col < 5; col++) {
+      guesses[lastRow][col] = targetArr[col];
+    }
+    
+    // Update the feedback array
+    for (let col = 0; col < 5; col++) {
+      feedbacks[lastRow][col] = 'correct';
+    }
+    
+    // Re-render the grid to show the correct word
+    renderGrid();
+    
+    console.log('Correct word revealed in grid:', targetWord); // Debug log
   }
 
   // --- Dark Theme Toggle ---

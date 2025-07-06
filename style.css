@@ -145,7 +145,7 @@ body.dark-theme .linkedin-icon:hover {
 #theme-toggle {
   margin-top: 0;
   margin-bottom: 0;
-  display: flex;
+  display: none; /* Hidden for now */
   align-items: center;
   justify-content: center;
   background: rgba(255,255,255,0.9);
