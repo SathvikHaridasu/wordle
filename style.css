@@ -175,6 +175,51 @@ body.dark-theme #theme-toggle svg {
   color: #f3f4f6;
 }
 
+/* Correct Answer Display */
+.correct-answer-display {
+  text-align: center;
+  margin: 20px auto;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #6aaa64, #538d4e);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(106, 170, 100, 0.3);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  max-width: 300px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.correct-answer-display.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.answer-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.answer-word {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark theme for correct answer */
+body.dark-theme .correct-answer-display {
+  background: linear-gradient(135deg, #538d4e, #3a5a40);
+  box-shadow: 0 4px 16px rgba(83, 141, 78, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Watermark Styles */
 #watermark {
   position: fixed;

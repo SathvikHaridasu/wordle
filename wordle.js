@@ -172,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (currentRow === 6) {
         gameState = 'lost';
         showFeedback(`Game Over! The word was ${targetWord}`, 'error', 0);
+        showCorrectAnswer();
         return;
       }
       hideFeedback();
@@ -213,6 +214,12 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('wordleGuesses');
       localStorage.removeItem('wordleUsedKeys');
       console.log('New day detected, cleared old game state');
+    }
+    
+    // Clear any existing correct answer display
+    const existingAnswer = document.getElementById('correct-answer');
+    if (existingAnswer) {
+      existingAnswer.remove();
     }
     
     targetWord = pickDailyWord();
@@ -321,6 +328,33 @@ document.addEventListener('DOMContentLoaded', () => {
       clearTimeout(feedback.timeout);
       feedback.timeout = null;
     }
+  }
+  
+  function showCorrectAnswer() {
+    // Create a special display for the correct answer
+    const correctAnswerDiv = document.createElement('div');
+    correctAnswerDiv.id = 'correct-answer';
+    correctAnswerDiv.className = 'correct-answer-display';
+    
+    const answerText = document.createElement('div');
+    answerText.className = 'answer-text';
+    answerText.textContent = 'The correct word was:';
+    
+    const answerWord = document.createElement('div');
+    answerWord.className = 'answer-word';
+    answerWord.textContent = targetWord;
+    
+    correctAnswerDiv.appendChild(answerText);
+    correctAnswerDiv.appendChild(answerWord);
+    
+    // Insert after the game grid
+    const gameGrid = document.getElementById('game-grid');
+    gameGrid.parentNode.insertBefore(correctAnswerDiv, gameGrid.nextSibling);
+    
+    // Animate in
+    setTimeout(() => {
+      correctAnswerDiv.classList.add('show');
+    }, 100);
   }
 
   // --- Dark Theme Toggle ---
