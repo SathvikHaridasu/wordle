@@ -23,13 +23,171 @@ body {
   position: relative;
 }
 
+body.dark-theme {
+  background: #18181b;
+  color: #f3f4f6;
+}
+
+body.dark-theme main#game {
+  background: none;
+}
+
+body.dark-theme header {
+  background: linear-gradient(180deg, rgba(36,36,40,0.95) 0%, rgba(24,24,27,0.85) 100%);
+  border: 1px solid rgba(60,60,60,0.3);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+body.dark-theme header h1 {
+  color: #f3f4f6;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+body.dark-theme header h1::after {
+  background: #6aaa64;
+  opacity: 0.95;
+}
+
+body.dark-theme #game-grid {
+  background: #23232a;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+}
+
+body.dark-theme .tile {
+  background: #23232a;
+  border: 2px solid #33343a;
+  color: #f3f4f6;
+}
+
+body.dark-theme .tile.correct {
+  background: #538d4e;
+  border-color: #538d4e;
+}
+body.dark-theme .tile.present {
+  background: #b59f3b;
+  border-color: #b59f3b;
+}
+body.dark-theme .tile.absent {
+  background: #3a3a3c;
+  border-color: #3a3a3c;
+}
+
+body.dark-theme #keyboard {
+  background: none;
+}
+body.dark-theme .key {
+  background: #33343a;
+  color: #f3f4f6;
+  border: none;
+}
+body.dark-theme .key.correct {
+  background: #538d4e;
+  color: #fff;
+}
+body.dark-theme .key.present {
+  background: #b59f3b;
+  color: #fff;
+}
+body.dark-theme .key.absent {
+  background: #3a3a3c;
+  color: #fff;
+}
+
+body.dark-theme #feedback {
+  background: #23232a;
+  color: #f87171;
+  border: 1px solid #444;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+body.dark-theme #feedback.success {
+  background: #19381a;
+  color: #4ade80;
+  border: 1px solid #3a5a40;
+}
+body.dark-theme #feedback.info {
+  background: #1e293b;
+  color: #60a5fa;
+  border: 1px solid #334155;
+}
+body.dark-theme #feedback.error {
+  background: #3f1d1d;
+  color: #f87171;
+  border: 1px solid #7f1d1d;
+}
+
+body.dark-theme #watermark {
+  background: none;
+}
+body.dark-theme .watermark-text {
+  background: rgba(36,36,40,0.9);
+  color: #d1d5db;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  border: 1px solid rgba(60,60,60,0.2);
+}
+body.dark-theme .social-links a {
+  background: rgba(36,36,40,0.9);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+body.dark-theme .github-icon {
+  color: #f3f4f6;
+}
+body.dark-theme .github-icon:hover {
+  color: #fff;
+}
+body.dark-theme .linkedin-icon {
+  color: #60a5fa;
+}
+body.dark-theme .linkedin-icon:hover {
+  color: #2563eb;
+}
+
+/* Theme toggle button */
+#theme-toggle {
+  margin-top: 0;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  padding: 7px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+#theme-toggle:hover {
+  background: #f3f4f6;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+#theme-toggle svg {
+  color: #333;
+  transition: color 0.2s;
+}
+body.dark-theme #theme-toggle {
+  background: #23232a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+body.dark-theme #theme-toggle:hover {
+  background: #18181b;
+}
+body.dark-theme #theme-toggle svg {
+  color: #f3f4f6;
+}
+
 /* Watermark Styles */
 #watermark {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 1000;
+  z-index: 2000;
   text-align: center;
+  pointer-events: auto;
+}
+
+.watermark-text,
+.social-links,
+#theme-toggle {
   pointer-events: auto;
 }
 
@@ -50,6 +208,7 @@ body {
   display: flex;
   gap: 12px;
   justify-content: center;
+  margin-bottom: 10px;
 }
 
 .social-icon {

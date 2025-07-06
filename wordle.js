@@ -323,6 +323,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // --- Dark Theme Toggle ---
+  (function() {
+    const body = document.body;
+    const toggleBtn = document.getElementById('theme-toggle');
+    let iconWrapper = document.getElementById('theme-icon-wrapper');
+
+    // SVGs for sun and moon
+    const sunSVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 6.95-1.41-1.41M6.34 6.34 4.93 4.93m12.02 0-1.41 1.41M6.34 17.66l-1.41 1.41"/></svg>';
+    const moonSVG = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>';
+
+    function setTheme(dark) {
+      if (dark) {
+        body.classList.add('dark-theme');
+        if (iconWrapper) iconWrapper.innerHTML = moonSVG;
+        localStorage.setItem('wordleTheme', 'dark');
+      } else {
+        body.classList.remove('dark-theme');
+        if (iconWrapper) iconWrapper.innerHTML = sunSVG;
+        localStorage.setItem('wordleTheme', 'light');
+      }
+    }
+
+    // On load, set theme from localStorage
+    const saved = localStorage.getItem('wordleTheme');
+    setTheme(saved === 'dark');
+
+    // Re-select iconWrapper after innerHTML replacement
+    function updateIconWrapper() {
+      iconWrapper = document.getElementById('theme-icon-wrapper');
+    }
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function() {
+        const isDark = body.classList.contains('dark-theme');
+        setTheme(!isDark);
+        // update iconWrapper reference
+        setTimeout(updateIconWrapper, 10);
+      });
+    }
+  })();
+
   // TODO: Add event listeners for keyboard and physical input
   // TODO: Implement game logic, state transitions, feedback, local storage, etc.
 }); 
